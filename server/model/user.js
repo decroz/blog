@@ -11,6 +11,7 @@ const userSchema = new Schema({
   email :{type:String, require:true, unique:true},
   password :{type:String, require:true},
   createdat :{type:Date,Default:Date.now()},
+  
 });
 
 module.exports =mongoose.model('user',userSchema);

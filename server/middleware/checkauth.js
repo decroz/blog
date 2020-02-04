@@ -3,9 +3,10 @@ const SECRET_KEY ="anything can be secert key faskdfjiue";
 
 const checkAuth = (req, res, next)=>{
 
-    let token= req.headers.authorization;
+    let token= req.headers.authorization.split('')[1];
     try{
         var decoded = jwt.verify(token,SECRET_KEY);
+        req.userData = decoded;
         next();
     }
     catch(err){
@@ -14,4 +15,4 @@ const checkAuth = (req, res, next)=>{
         })
     }
 }
-module.exports= checkAuth;
+module.exports = checkAuth;

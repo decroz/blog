@@ -13,13 +13,13 @@ const{
 //fetch all posts
 router.get('/',checkAuth, getPosts);
 //fetch single post by id
-router.get('/:_id',checkAuth,getPost);
+router.get('/:_id',getPost);
 //create new post
-router.post('/',createPost);
+router.post('/',checkAuth,createPost);
 //update post
-router.patch('/:_id',updatePost)
+router.patch('/:_id',checkAuth,updatePost)
 //delete post
-router.delete('/:_id',deletePost)
+router.delete('/:_id',checkAuth,deletePost)
 
 const {login,
     signup
@@ -29,4 +29,3 @@ router.post('/login',login);
 router.post('/signup',signup);
 
 module.exports = router;
-

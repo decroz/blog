@@ -1,10 +1,28 @@
 const post = require('../model/post');
+const User = require('../model/user');
 const Joi = require('@hapi/joi');
 
 //fetsh all posts
 const getPosts=async(req,res)=>{
     try{
-        let data = await post.find();
+        //let data = await post.find().populate({path:'createdBy', select:'name email',model:User});
+
+        let data = await post.aggregate([
+            {
+                $lookup:{
+                    from :"users",
+                    localField:"createdBy",
+                    foreignField:"_id",
+                    as:"authur"
+                }
+            },
+            {
+                $project:{
+                    "authur.password":0,
+                    "authur._id":0
+                }
+            }
+        ])
         if(data.length === 0){
             return res.status(404).json({
                 message:'No data found'
@@ -25,7 +43,7 @@ const getPost = async(req,res)=>{
     //res.send('Get id '+ _id);
     try{
         let result = await post.findOne({_id});
-
+        
         if (result === null){
             return res.status(400).json({
                 message:"invalid Id"
@@ -35,12 +53,14 @@ const getPost = async(req,res)=>{
     }
     catch(err){
         res.status(500).json({
-            message:error.message    
+            message:err.message    
         })
     }
 };
 //create new posts
 const createPost = async (req,res)=>{
+    console.log(req.userData);
+    console.log(req.headers.Authorization);
     let data =req.body;
 
     //validation
@@ -54,10 +74,12 @@ const createPost = async (req,res)=>{
     const schema = Joi.object({
         title : Joi.string().min(10).max(255).required(),
         body : Joi.string().min(3).max(20000),
-        createdat : Joi.any()
+        createdat : Joi.any(),
+        createdBy:Joi.any()
     })
 
     data.createdat= Date.now();
+    data.createdBy = req.userData._id;
 
     console.log(data);
     let newPost = new post(data);
@@ -70,17 +92,16 @@ const createPost = async (req,res)=>{
         // }
 
         // using map
-        let message= validationError.error.details.map(data =>{
-            return data.message;
-       })
-
-        return res.status(422).json({
-            message
-        })
-        console.log(validationError.error.details[0].error);
+        
 
         if(validationError && validationError.error){
-            return res.status(422).json(validationError);
+            let message= validationError.error.details.map(data =>{
+                return data.message;
+           })
+    
+            return res.status(422).json({
+                message
+            });
         }
 
         let result = await newPost.save(data);
@@ -120,9 +141,13 @@ const createPost = async (req,res)=>{
 const updatePost =async (req,res)=>{
     
     let {_id} = req.params;
+    //let postid =_id;
+
     try{
         let result = await post.updateOne(
-            {_id},
+            {_id, 
+                createdBy: req.userData._id
+            },
             {$set:req.body}
         );
             console.log(result);
@@ -148,7 +173,7 @@ const deletePost = async (req,res)=>{
     //
     let {_id} = req.params;
     try{
-        let result = await post.deleteOne({_id});
+        let result = await post.deleteOne({_id, createdBy: req.userData._id});
         let {deletedCount} =result;
         if(deletedCount===0){
             return res.status(400).json({
