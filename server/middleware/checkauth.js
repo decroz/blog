@@ -3,7 +3,7 @@ const SECRET_KEY ="anything can be secert key faskdfjiue";
 
 const checkAuth = (req, res, next)=>{
 
-    let token= req.headers.authorization.split('')[1];
+    let token= req.headers.authorization.split(" ")[1];//bearer
     try{
         var decoded = jwt.verify(token,SECRET_KEY);
         req.userData = decoded;

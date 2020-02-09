@@ -28,4 +28,47 @@ const {login,
 router.post('/login',login);
 router.post('/signup',signup);
 
+router.post('/fileupload',(req,res,next)=>{
+    if (!req.files || Object.keys(req.files).length ===0){
+        return res.status(400).json({
+            message:"No files were uploaded."
+        });
+    }
+
+    let files = req.files;
+
+    // is exceed file limit
+    if(files.myFile.truncated === true){
+        return res.status(400).json({
+            message:"File size too large"
+        }) 
+    }
+
+    //filetype
+    if(files.myFile.mimetype !== 'image/jpeg' && files.myFile.mimetype !=='image/png'){
+        return res.status(400).json({
+            message:"files not of given type"
+        })
+    }
+
+    files.myFile.name= `${Date.now()}-${files.myFile.name}`;
+
+    console.log(appRoot);
+
+    let filePath = `${appRoot}/public/${files.myFile.name}`;
+
+    files.myFile.mv(filePath,(err)=>{
+        if(err){
+            return res.status(400).send(err)
+        }else{
+            res.send("file uploaded")
+        }
+    })
+    console.log(req.files);
+})
+
 module.exports = router;
+
+//helmet
+//cors
+//hereko

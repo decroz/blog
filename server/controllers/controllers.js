@@ -5,7 +5,9 @@ const Joi = require('@hapi/joi');
 //fetsh all posts
 const getPosts=async(req,res)=>{
     try{
-        //let data = await post.find().populate({path:'createdBy', select:'name email',model:User});
+        //let data = await post.find()
+        //.populate({path:'createdBy', select:'name email',model:User})
+        //.sort{createdat : -1};
 
         let data = await post.aggregate([
             {
@@ -138,7 +140,7 @@ const createPost = async (req,res)=>{
     // res.send('POST');
 };
 //update new post
-const updatePost =async (req,res)=>{
+const updatePost = async (req,res)=>{
     
     let {_id} = req.params;
     //let postid =_id;
@@ -173,7 +175,9 @@ const deletePost = async (req,res)=>{
     //
     let {_id} = req.params;
     try{
-        let result = await post.deleteOne({_id, createdBy: req.userData._id});
+        let result = await post.deleteOne(
+            {_id, createdBy: req.userData._id}
+            );
         let {deletedCount} =result;
         if(deletedCount===0){
             return res.status(400).json({
