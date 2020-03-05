@@ -19,19 +19,22 @@ const login = async (req,res,next)=>{
      try{
         const loginValidatorError = await schemaLogin.validate(req.body,{abortEarly:false} );
         if (loginValidatorError && loginValidatorError.error){
+            console.log(loginValidatorError);
             let loginerrormsg = loginValidationError.error.details.map(data=>{
                 return data.message
             })
             return res.status(422).json({
                 loginerrormsg
             })
-        }
+        }//eof valldation
     
     //santitize
     email = email.toLowerCase();
 
     //matching email to db
+    console.log(req.body)
     let currentUser = await User.findOne({email});
+    console.log(currentUser);
 
     //if not found throw err
     //user not exists

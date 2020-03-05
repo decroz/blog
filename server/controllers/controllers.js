@@ -30,6 +30,7 @@ const getPosts=async(req,res)=>{
                 message:'No data found'
             })
         }
+       
         res.status(200).json(data);
     }catch(err){
         res.status(500).json({

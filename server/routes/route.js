@@ -11,7 +11,7 @@ const{
 } = require('../controllers/controllers')
 
 //fetch all posts
-router.get('/',checkAuth, getPosts);
+router.get('/', getPosts);
 //fetch single post by id
 router.get('/:_id',getPost);
 //create new post

@@ -1,6 +1,9 @@
 const express = require ('express');
 const fileUpload = require('express-fileupload');
 const app = express();
+const cors = require('cors');
+app.use(cors());
+
 let PORT = 5000;
 global.appRoot = __dirname;
 
